@@ -24,8 +24,7 @@ public:
     rclcpp::NodeOptions node_options;
     node_options.automatically_declare_parameters_from_overrides(true);
 
-    move_group_node_ =
-        rclcpp::Node::make_shared("move_group_node", node_options);
+    move_group_node_ = rclcpp::Node::make_shared("move_group_node", node_options);
     executor_.add_node(move_group_node_);
     std::thread([this]() { this->executor_.spin(); }).detach();
 
@@ -91,7 +90,7 @@ public:
 
     // 6. lift the object up in a start line
     RCLCPP_INFO(LOGGER, "Retreating...");
-    move_group_robot_->setMaxVelocityScalingFactor(0.5);
+    move_group_robot_->setMaxVelocityScalingFactor(0.25);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     execute_cartesian_trajectory(+0.343, +0.132, (target_pose_robot_.position.z - delta_), -1.000, +0.000, +0.000, +0.000);
 
@@ -102,6 +101,7 @@ public:
     current_state_robot_->copyJointGroupPositions(joint_model_group_robot_, joint_group_positions_robot_);
     joint_group_positions_robot_[0] += M_PI; 
     move_group_robot_->setJointValueTarget(joint_group_positions_robot_);
+    move_group_robot_->setMaxVelocityScalingFactor(0.1);
     plan_trajectory_kinematics();
     execute_trajectory_kinematics();
 
